@@ -84,11 +84,11 @@ public class PruebaRobot extends TeamRobot{
     
     
     public void print(LinkedList<node> a){
-        System.out.println("ESTOY EN FUNCION PRINT: ");
+        //System.out.println("ESTOY EN FUNCION PRINT: ");
         for (int i = 0; i < a.size(); i++) {
             System.out.print(" - "+a.get(i).distancia+ " & "+a.get(i).name );
         }
-        System.out.println("\n PRINT DONE");
+        //System.out.println("\n PRINT DONE");
         
     }
     
@@ -117,7 +117,7 @@ public class PruebaRobot extends TeamRobot{
     public void onPaint(Graphics2D g) {
         // Set the paint color to red
         //g.setColor(java.awt.Color.GREEN);
-        setRadarColor(java.awt.Color.GREEN);
+        setRadarColor(java.awt.Color.RED);
         // Paint a filled rectangle at (50,50) at size 100x150 pixels
         //g.fillRect(50, 50, 100, 150);
     } 
@@ -172,7 +172,7 @@ public class PruebaRobot extends TeamRobot{
 
 
         if((c1.size() == 5) || (c0.size() == 5) || (c2.size() == 5) || (c3.size() == 5)){
-            System.out.println("Entro en Asignar cantonada");
+            //System.out.println("Entro en Asignar cantonada");
             AsignarCantonada();
         } 
         
@@ -246,7 +246,7 @@ public class PruebaRobot extends TeamRobot{
         
         System.out.print("distArray --> ");
         print(distArray);
-        System.out.print("El kamikaze es: "+kamikaze);
+        System.out.println("El kamikaze es: "+kamikaze);
         
         //DistanciaHaciaLaEsquina:
         enviarMensajesAsignación();
@@ -254,18 +254,27 @@ public class PruebaRobot extends TeamRobot{
     }
     
     public void centinella(){
-        try {
-            System.out.println("ESPEROOOOOOOOOOOOOO");
-            //wait(1000);
-            TimeUnit.SECONDS.sleep(1);
-            System.out.println("TERMINE DE ESPEROOOOOOOOOOOOOO"); 
-        } catch (Exception e) {
-            System.out.println("EXCEPCION");
-        }
+
         back(50);
         ahead(50);   
     }
 
+    public void girar(double angulo){
+        System.out.println("Angulo antes de entrar en girar: "+angulo);
+        if(angulo < 0.0){
+            angulo= 360+angulo;
+        }
+        System.out.println("Angulo convertido: "+angulo);
+        if((angulo>=0.0) && (angulo<= 180.0)){
+            System.out.println("Der");
+            turnRight(angulo);
+        }else{
+            System.out.println("Izq");
+            turnLeft(angulo);
+                
+        }
+
+    }
     
     
     public void onMessageReceived(MessageEvent event) {
@@ -323,21 +332,29 @@ public class PruebaRobot extends TeamRobot{
             System.out.println("Mis X:"+getX());
             System.out.println("Mis X:"+getY());
             double ang = calcularAngulo(getX(), getY(), indice);
-            turnRight(ang); //Antes estaba puesto angulo restante
+            
+            System.out.println("ANGULO GIRO: "+ ang);
+            /*if(ang > 360){
+                ang = ang % 360; 
+                System.out.println("IF:(ang > 360) ANGULO GIRO: "+ ang);
+            }*/
+            girar(ang);
+            
+            //turnRight(ang); //Antes estaba puesto angulo restante
             ahead(dist);
             
             
-            System.out.print("!!!!!!!!!!!DISPARAR!!!!!!!!!!!!!");
+           // System.out.print("!!!!!!!!!!!DISPARAR!!!!!!!!!!!!!");
             if(indice == 0) turnGunRight(calcularAngulo(getX(), getY(), 2));
             else if(indice == 1) turnGunRight(calcularAngulo(getX(), getY(), 3));
             else if(indice == 2) turnGunRight(calcularAngulo(getX(), getY(), 0));
             else turnGunRight(calcularAngulo(getX(), getY(), 1));
             
-            fire(5.9);
-            while(true){
+            //fire(1);
+            /*while(true){
                 centinella();
                 turnRadarRight(Double.POSITIVE_INFINITY);
-            }
+            }*/
             //System.out.print("!!!!!!!!!!!POSITIVE_INFINITY!!!!!!!!!!!!!");
             
             //turnGunRight(1000);
