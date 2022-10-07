@@ -4,6 +4,7 @@
  */
 package epsevg.upc.edu.c2223;
 
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import robocode.HitByBulletEvent;
@@ -18,8 +19,11 @@ import robocode.MessageEvent;
 //import java.util.TreeMap;
 //import java.util.Map;
 import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 //import robocode.util;
 import java.lang.Math;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -27,6 +31,22 @@ import java.lang.Math;
  */
 
 public class PruebaRobot extends TeamRobot{
+    /*public class Pair{
+        public String name;
+        public Double distancia;
+        public Pair(Double distancia, String name){
+            this.distancia = distancia;
+            this.name = name;
+        }  
+    }*/
+    
+    
+    
+    
+    
+    
+    
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     
     
     private static TreeMap<Double,String> t_corner0 = new TreeMap<Double,String>();
@@ -41,16 +61,34 @@ public class PruebaRobot extends TeamRobot{
     private static double distancia_t4= 0.0;
     
     private double angulo = 0.0;
+    private static String kamikaze = "";
     //------------------
 
-    //static String[] quinCorner = new String [4];
-    static Double X_1, Y_1, X_2, Y_2;
-    static Boolean T1_OnCorner, T2_OnCorner, T3_OnCorner, T4_OnCorner, T5_OnCorner = false;
+    
+    static Double X_1, Y_1;
+    static Boolean OnCorner=false;
+    
+    LinkedList<node> c0 = new LinkedList<node>();
+    LinkedList<node> c1 = new LinkedList<node>();
+    LinkedList<node> c2 = new LinkedList<node>();
+    LinkedList<node> c3 = new LinkedList<node>();
+    LinkedList<node> distArray = new LinkedList<node>();
     
     
+    
+    
+    public void print(LinkedList<node> a){
+        //System.out.println("ESTOY EN FUNCION PRINT: ");
+        for (int i = 0; i < a.size(); i++) {
+            System.out.print(" - "+a.get(i).distancia+ " & "+a.get(i).name );
+        }
+        //System.out.println("\n PRINT DONE");
+        
+    }
     
     public void run(){
         //turnLeft(getHeading());
+        setRadarColor(java.awt.Color.GREEN);
         double x_t = getX(), y_t = getY();
         out.println("   MIIIII Coordenada X: "+x_t);
         out.println("    MIIIII  Coordenada Y: "+y_t);
@@ -65,70 +103,199 @@ public class PruebaRobot extends TeamRobot{
             calculaDistancia("epsevg.upc.edu.c2223.PruebaRobot* (3)", x_t, y_t);
             //FIXME: Cambiar nombres de variables propias del robot para que sea menos lioso
         }
-        //System.out.println("TreeMap_Corner0 Elements...\n" + t_corner0);
-        //System.out.println("TreeMap_Corner1 Elements...\n" + t_corner1);
-        //System.out.println("TreeMap_Corner2 Elements...\n" + t_corner2);
-        //System.out.println("TreeMap_Corner3 Elements...\n" + t_corner3);
-        //AsignarEsquina();
-        
-        //while(true){
-            
-            //ahead(-1000);
-            //turnRight(90);
+        System.out.println("El kamikaze en el run es: "+kamikaze);
+        //if(kamikaze.equals(getName())){
+        //    while(true){
+        //        turnRight(90);
+        //        fire(1);
+        //    }
         //}
+        
+        
     }
     @Override
     public void onPaint(Graphics2D g) {
         // Set the paint color to red
         //g.setColor(java.awt.Color.GREEN);
-        setRadarColor(java.awt.Color.GREEN);
+        setRadarColor(java.awt.Color.RED);
         // Paint a filled rectangle at (50,50) at size 100x150 pixels
         //g.fillRect(50, 50, 100, 150);
     } 
+    
+    public double calcularAngulo(double xtank, double ytank, int indice){
+        double xc, yc;
+        if(indice==0){
+            xc= 0.0;
+            yc= 0.0;
+        }else if(indice==1){
+            xc= 0.0;
+            yc= getBattleFieldHeight();
+        }else if(indice==2){
+            xc= getBattleFieldWidth();
+            yc= getBattleFieldHeight();
+        }else{
+            xc= getBattleFieldWidth();
+            yc= 0.0;
+        }
+        double gamma = getHeading();
+        double a=xc-xtank;
+        double b=yc-ytank;
+        double alfa= Math.toDegrees(Math.atan2(b,a));
+        double beta=-gamma-(alfa-90.0);
+        
+        return beta;
+    }
     
     public double obtenirDistanciaEsquina(double xc, double xtank, double yc, double ytank){
         //return Math.abs(xc-xtank) + Math.abs(yc-ytank);
         return Math.sqrt((Math.pow((xc-xtank),2))+(Math.pow((yc-ytank),2)));
     }
-
+    
     public void calculaDistancia(String CualTankSoy, double x, double y){
-        //double DistEsq = 0.0;
-        System.out.println("Tanque Que entra en CualTankSoy "+CualTankSoy);
-        if(CualTankSoy.equals("epsevg.upc.edu.c2223.PruebaRobot* (1)") ){
-           distancia_t1=obtenirDistanciaEsquina(0.0, x, 800.0, y);
-           //Probamos a enviar un mensaje
-           try {
-               sendMessage("epsevg.upc.edu.c2223.PruebaRobot* (1)", "DistanciaHaciaLaEsquina:"+distancia_t1+"-"+"epsevg.upc.edu.c2223.PruebaRobot* (1)");  
-                    //epsevg.upc.edu.c2223.PruebaRobot* (3) sent me: 142.91460826814074,717.9883720521718
-            } catch (IOException ignored) {}
-        }else if(CualTankSoy.equals("epsevg.upc.edu.c2223.PruebaRobot* (2)")){
-            distancia_t2=obtenirDistanciaEsquina(1000.0, x, 800.0, y);
-        }else if(CualTankSoy.equals("epsevg.upc.edu.c2223.PruebaRobot* (3)")){
-            distancia_t3=obtenirDistanciaEsquina(1000.0, x, 0.0, y);
-        }else if(CualTankSoy.equals("epsevg.upc.edu.c2223.PruebaRobot* (4)")){
-            distancia_t4=obtenirDistanciaEsquina(0.0, x, 0.0, y);
+        //System.out.println("ESTOY EN FUNCION calculaDistancia: ");
+        //System.out.println("Tanque Que entra en CualTankSoy "+CualTankSoy);
+        double margen = 75.0;
+        double distancia_c0=obtenirDistanciaEsquina(0.0+margen, x, 0.0+margen, y);
+        double distancia_c1=obtenirDistanciaEsquina(0.0+margen, x, getBattleFieldHeight()-margen, y);
+        double distancia_c2=obtenirDistanciaEsquina(getBattleFieldWidth()-margen, x, getBattleFieldHeight()-margen, y);
+        double distancia_c3=obtenirDistanciaEsquina(getBattleFieldWidth()-margen, x, 0.0+margen, y);
         
-        }
-        /*for(int i =0; i<4; ++i){
-            if(i==0){
-                DistEsq = obtenirDistanciaEsquina(0.0, x, 0.0, y);
-                
-                //t_corner0.put(DistEsq, CualTankSoy+"_c"+i);
-            }else if(i == 1){
-                DistEsq = obtenirDistanciaEsquina(0.0, x, 800.0, y);
-                t_corner1.put(DistEsq, CualTankSoy+"_c"+i);
-            }else if(i == 2){
-                DistEsq = obtenirDistanciaEsquina(1000.0, x, 800.0, y);
-                t_corner2.put(DistEsq, CualTankSoy+"_c"+i);
-            }else{
-                DistEsq = obtenirDistanciaEsquina(1000.0, x, 0.0, y);
-                t_corner3.put(DistEsq, CualTankSoy+"_c"+i);
+        node n;
+        n = new node(distancia_c0, CualTankSoy);
+        c0.add(n); Collections.sort(c0); //añade y ordena la lista
+        n = new node(distancia_c1, CualTankSoy);
+        c1.add(n); Collections.sort(c1);
+        n = new node(distancia_c2, CualTankSoy);
+        c2.add(n); Collections.sort(c2);
+        n = new node(distancia_c3, CualTankSoy);
+        c3.add(n); Collections.sort(c3);
+
+
+        if((c1.size() == 5) || (c0.size() == 5) || (c2.size() == 5) || (c3.size() == 5)){
+            //System.out.println("Entro en Asignar cantonada");
+            AsignarCantonada();
+        } 
+        
+    }
+
+    public void remove(LinkedList<node> a, String name){
+        int index = 0;
+        for(int i = 0; i < a.size(); i++) {
+            if(a.get(i).name.equals(name)){
+                index=i;
+                //return;
+                i = a.size();
             }
-        } */
-        
+        }
+        //System.out.print(" INDEX TO REMOVE: "+ index);
+        a.remove(index); //print(c1);
+    }
+    
+    public void enviarMensajesAsignación(){
+        try {
+            sendMessage(distArray.get(0).name, "DistanciaHaciaLaEsquina:"+distArray.get(0).distancia+"-"+0); 
+        } catch (IOException ignored) {}
+
+        try {
+            sendMessage(distArray.get(1).name, "DistanciaHaciaLaEsquina:"+distArray.get(1).distancia+"-"+1); 
+        } catch (IOException ignored) {}
+
+        try {
+            sendMessage(distArray.get(2).name, "DistanciaHaciaLaEsquina:"+distArray.get(2).distancia+"-"+2); 
+        } catch (IOException ignored) {}
+        try {
+            sendMessage(distArray.get(3).name, "DistanciaHaciaLaEsquina:"+distArray.get(3).distancia+"-"+3); 
+        } catch (IOException ignored) {}
 
     }
 
+    public void AsignarCantonada(){
+        //tank_asig, distArray
+        node n;
+        //c0
+        System.out.println("---------IMPRIMIENDO LISTAS--------");
+        print(c0);
+        print(c1);
+        print(c2);
+        print(c3);
+        System.out.println("-----------------------------------");
+        n = c0.getFirst(); 
+        distArray.add(n);
+        //System.out.println("c0.getFirst() --> "+ c0.getFirst().distancia + " & "+ c0.getFirst().name);
+         //System.out.print("distArray --> ");print(distArray);
+        //System.out.print(" <-- FINNNN distArray  ");
+        //c1.remove(n.name);
+        remove(c1,n.name); 
+        remove(c2,n.name);
+        remove(c3,n.name);
+        //c1
+        n = c1.getFirst();  
+        distArray.add(n);
+        
+        remove(c2,n.name); 
+        remove(c3,n.name);
+        //c2
+        n = c2.getFirst();  
+        distArray.add(n);
+        remove(c3,n.name);
+        //c3
+        n = c3.getFirst();  
+        distArray.add(n);
+        remove(c3,n.name);
+        kamikaze=c3.getFirst().name;
+        
+        System.out.print("distArray --> ");
+        print(distArray);
+        System.out.println("El kamikaze es: "+kamikaze);
+        
+        //DistanciaHaciaLaEsquina:
+        enviarMensajesAsignación();
+        
+    }
+    
+    public void centinella(int esquina) {
+        double heading = getHeading();
+        System.out.println("getHeading(): " + heading);
+
+        try {
+            if ((heading <= 90.0) && (heading >= 0.0)) { // cuadrante I
+                if ((esquina == 0) || (esquina == 1))
+                    turnRight(90.0 - heading);
+                else
+                    turnLeft(90.0 + heading);
+            } else if (((heading > 90.0) && (heading <= 180.0)) || ((heading > 180.0) && (heading <= 270.0))) { // cuadrante
+                                                                                                                // II ||
+                                                                                                                // cuadrante
+                                                                                                                // III
+                if ((esquina == 0) || (esquina == 1))
+                    turnLeft(heading - 90.0);
+                else
+                    turnRight(270.0 - heading);
+            } else if ((heading > 270.0) && (heading <= 360.0)) { // cuadrante IV
+                if ((esquina == 0) || (esquina == 1))
+                    turnRight((360.0 - heading) + 90.0);
+                else
+                    turnLeft(heading - 270.0);
+            }
+            ahead(100);
+            back(100);
+        } catch (Exception e) {
+            System.out.println("EXCEPCION");
+        }
+
+    }
+
+    public void girar(double angulo){
+        if(angulo <=-180.0){
+            angulo = 360+angulo;
+        }else if(angulo>=180.0){
+            angulo = 360-angulo;
+        }
+        System.out.println("Angulo convertido: "+angulo);
+        turnRight(angulo);
+        
+        
+    }
     
     
     public void onMessageReceived(MessageEvent event) {
@@ -147,34 +314,31 @@ public class PruebaRobot extends TeamRobot{
             String comvalue = ssb1[1];
             String[] ssb2 = comvalue.split(",");
             String coordX = ssb2[0];
-            System.out.println("========================================");
-            System.out.println("Que tiene el comvalue "+comvalue);
-            System.out.println("========================================");
-            System.out.println("========================================");
-            System.out.println("Las X son:"+coordX);
-            System.out.println("========================================");
             String coordY = ssb2[1];
+            X_1 = Double.parseDouble(coordX); 
+            Y_1 = Double.parseDouble(coordY);
+ 
             if("epsevg.upc.edu.c2223.PruebaRobot* (1)".equals(sender)){
-                X_1 = Double.parseDouble(coordX); 
-                Y_1 = Double.parseDouble(coordY);
-                out.println("X_1 recibido = " +X_1+ "  Y_1 recibido = " +Y_1+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                //out.println("X_1 recibido = " +X_1+ "  Y_1 recibido = " +Y_1+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 calculaDistancia(sender, X_1, Y_1);
             }
             else if("epsevg.upc.edu.c2223.PruebaRobot* (2)".equals(sender)){
-                X_2 = Double.parseDouble(coordX); 
-                Y_2 = Double.parseDouble(coordY);
-                out.println("X_2 recibido = " +X_2+ "  Y_2 recibido = " +Y_2+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
-                calculaDistancia(sender, X_2, Y_2);
+                
+                //out.println("X_1 recibido = " +X_1+ "  Y_1 recibido = " +Y_1+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
+                calculaDistancia(sender, X_1, Y_1);
             }else if("epsevg.upc.edu.c2223.PruebaRobot* (3)".equals(sender)){
-                X_2 = Double.parseDouble(coordX); 
-                Y_2 = Double.parseDouble(coordY);
-                out.println("X_2 recibido = " +X_2+ "  Y_2 recibido = " +Y_2+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
-                calculaDistancia(sender, X_2, Y_2);
+                
+                //out.println("X_1 recibido = " +X_1+ "  Y_1 recibido = " +Y_1+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
+                calculaDistancia(sender, X_1, Y_1);
             }else if("epsevg.upc.edu.c2223.PruebaRobot* (4)".equals(sender)){
-                X_2 = Double.parseDouble(coordX); 
-                Y_2 = Double.parseDouble(coordY);
-                out.println("X_2 recibido = " +X_2+ "  Y_2 recibido = " +Y_2+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
-                calculaDistancia(sender, X_2, Y_2);
+               
+                //out.println("X_1 recibido = " +X_1+ "  Y_1 recibido = " +Y_1+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
+                calculaDistancia(sender, X_1, Y_1);
+            }else if("epsevg.upc.edu.c2223.PruebaRobot* (5)".equals(sender)){
+               
+                //out.println("X_1 recibido = " +X_1+ "  Y_1 recibido = " +Y_1+ "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
+                calculaDistancia(sender, X_1, Y_1);
             }
         
         }else if(command.equals("DistanciaHaciaLaEsquina")){
@@ -183,44 +347,42 @@ public class PruebaRobot extends TeamRobot{
             String stringdist = ssb2[0];
             System.out.println("Distancia llegada:"+stringdist);
             double dist = Double.parseDouble(stringdist);
-            String reciver = ssb2[1];
+            String strgindice = ssb2[1];
+            int indice = Integer.parseInt(strgindice);
+            
+            System.out.println("Mis X:"+getX());
+            System.out.println("Mis X:"+getY());
+            double ang = calcularAngulo(getX(), getY(), indice);
             
             
-            if("epsevg.upc.edu.c2223.PruebaRobot* (1)".equals(reciver)){
-                System.out.println("Hacia donde miro: "+getHeading());
-                double angulo_restante = 315.0-getHeading();
-                //dist = (0.0+dist*Math.sin(angulo_restante))+Math.abs(800+dist*Math.cos(angulo_restante));
-                System.out.println("Angulo_restante: "+angulo_restante);
-                //
-                turnRight(angulo_restante);
-                ahead(dist);
-                System.out.println(">>>>Distancia: "+dist);
-                //setAdjustRadarForRobotTurn(true); //Preguntar bernat
-                //setTurnRight(angulo_restante);
-                //setAhead(dist);
-                //setRadarColor(java.awt.Color.GREEN);
-                //execute();
-                
-            }else if("epsevg.upc.edu.c2223.PruebaRobot* (2)".equals(sender)){
-                turnRight(45);
-                ahead(dist);
-            }else if("epsevg.upc.edu.c2223.PruebaRobot* (3)".equals(sender)){
-                turnRight(135);
-                ahead(dist);
-            }else if("epsevg.upc.edu.c2223.PruebaRobot* (4)".equals(sender)){
-                turnRight(225);
-                ahead(dist);
-            }else{
-                System.out.println("No es ninguno de los 4");
+            girar(ang);
+            ahead(dist);
+            //----Radar giratorio---
+            for (int i = 0; i < 10; i++) {
+                turnRadarRight(360);
             }
             
+            centinella(indice);
+            if(indice == 0) turnGunRight(calcularAngulo(getX(), getY(), 2));
+            else if(indice == 1) turnGunRight(calcularAngulo(getX(), getY(), 3));
+            else if(indice == 2) turnGunRight(calcularAngulo(getX(), getY(), 0));
+            else turnGunRight(calcularAngulo(getX(), getY(), 1));
+            
+            
+            
+          
         }
         
    }
     
     public void onScannedRobot(ScannedRobotEvent e){
+        System.out.println("Nombre del robot que detecto: "+e.getName());
         if(! isTeammate(e.getName())){
-            fire(1);
+            System.out.println("ESTOY A ESTA DISTANCIA "+ e.getDistance() +"DEL ENEMIGO: "+ e.getName());
+            while(true){
+                fire(1);
+            }
+            
         }
     }
     
