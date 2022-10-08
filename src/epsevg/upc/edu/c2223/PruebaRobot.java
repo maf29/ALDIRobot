@@ -46,7 +46,7 @@ public class PruebaRobot extends TeamRobot{
     private static double distancia_t4= 0.0;
     
     private double angulo = 0.0;
-    private static String kamikaze = "";
+    private static String kamikaze;
    
     
     static Double X_1, Y_1;
@@ -60,6 +60,7 @@ public class PruebaRobot extends TeamRobot{
     
     LinkedList<node> enemigos = new LinkedList<node>();
     static node enemigo_cercano;
+    static boolean encontrado = false; 
     
     
  
@@ -111,15 +112,35 @@ public class PruebaRobot extends TeamRobot{
         /*for (int i = 0; i < 5; i++) {
                 turnRadarRight(360);
         }*/
-        turnRadarRight(360);
-        turnRadarLeft(360);
+        turnRadarRight(360);//turnGunRight(360);
+        turnRadarLeft(360);//turnGunLeft(360);
         print(enemigos);
         
         enemigo_cercano = new node(enemigos.get(0).distancia, enemigos.get(0).name);
         System.out.println("\n @@@@@@ ENEMIGO MÁS CERCANO ES: : "+enemigo_cercano.name+"    esta a distancia: "+enemigo_cercano.distancia);
+        System.out.println(kamikaze +" ?==? "+getName());
+        if(kamikaze.equals(getName())){
+            System.out.println("!!!!!!!!!!!!!!!!!SOY EL KAMIKAZEEE");
+        }
         
-       
+        //turnRadarRight(360);
+        //if(enemigo_cercano.name == robot_detected)
+        //turnRadarLeft(360);
+        //setAdjustRadarForGunTurn(true);
+        while(!encontrado){
+            turnRadarRight(5); 
+            turnGunRight(10);  
+            
+        }
+        if(encontrado){
+            //turnRadarRight(5); 
+            //turnGunRight(15);  
+            //if(enemigo_cercano.distancia > 80)
+            while(true) fire(1);
+        }
+        
     }
+    
     @Override
     public void onPaint(Graphics2D g) {
         // Set the paint color to red
@@ -249,6 +270,9 @@ public class PruebaRobot extends TeamRobot{
         System.out.print("distArray --> ");
         print(distArray);
         System.out.println("El kamikaze es: "+kamikaze);
+        try{
+            broadcastMessage("kamikaze:"+kamikaze);
+        }catch(IOException ignored){}
         
         //DistanciaHaciaLaEsquina:
         enviarMensajesAsignación();
@@ -353,11 +377,11 @@ public class PruebaRobot extends TeamRobot{
            
             centinella(indice);
             
-            if(indice == 0) turnGunRight(calcularAngulo(getX(), getY(), 2));
+            /*if(indice == 0) turnGunRight(calcularAngulo(getX(), getY(), 2));
             else if(indice == 1) turnGunRight(calcularAngulo(getX(), getY(), 3));
             else if(indice == 2) turnGunRight(calcularAngulo(getX(), getY(), 0));
             else turnGunRight(calcularAngulo(getX(), getY(), 1));
-            
+            */
             
             
             /*for (int i = 0; i < 20; i++) {
@@ -369,6 +393,10 @@ public class PruebaRobot extends TeamRobot{
             
             
           
+        }
+        else if(command.equals("kamikaze")){
+            kamikaze = ssb1[1];
+            System.out.println("22==================kamikaze: "+kamikaze+" ======================");
         }
         
    }
@@ -391,27 +419,26 @@ public class PruebaRobot extends TeamRobot{
             int i = 0;
             while(!find && i < enemigos.size()){
                 if(enemigos.get(i).name == name) find = true;
+                else if((enemigos.get(i).name == name) && (enemigos.get(i).distancia != distancia_enemigo)){
+                    enemigos.get(i).distancia = distancia_enemigo;
+                    find = true;
+                }
                 i++;
             }
             if(!find){
                 enemigos.add(n);
                 Collections.sort(enemigos);
             }
-            /*
-            for (int i = 0; i < enemigos.size(); i++) {
-                System.out.print(" - "+a.get(i).distancia+ " & "+a.get(i).name );
-            }*/
-            /*while(true){
-                fire(1);
-            }*/
-            
         }
         
+        if((enemigo_cercano != null) && (enemigo_cercano.name).equals(e.getName())){
+            encontrado = true;
+        }
     }
     
     @Override
     public void onHitByBullet(HitByBulletEvent e){
-        turnLeft(180);
+        //turnLeft(180);
     }
 
         
