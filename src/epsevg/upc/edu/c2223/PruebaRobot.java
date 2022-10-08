@@ -91,7 +91,6 @@ public class PruebaRobot extends TeamRobot{
    }
     
     public void run(){
-        //turnLeft(getHeading());
         setRadarColor(java.awt.Color.GREEN);
         double x_t = getX(), y_t = getY();
         out.println("   MIIIII Coordenada X: "+x_t);
@@ -109,11 +108,9 @@ public class PruebaRobot extends TeamRobot{
         }
         System.out.println("El kamikaze en el run es: "+kamikaze);
         
-        /*for (int i = 0; i < 5; i++) {
-                turnRadarRight(360);
-        }*/
-        turnRadarRight(360);//turnGunRight(360);
-        turnRadarLeft(360);//turnGunLeft(360);
+        
+        turnRadarRight(360);turnGunRight(360);
+        turnRadarLeft(360);turnGunLeft(360);
         print(enemigos);
         
         enemigo_cercano = new node(enemigos.get(0).distancia, enemigos.get(0).name);
@@ -123,19 +120,13 @@ public class PruebaRobot extends TeamRobot{
             System.out.println("!!!!!!!!!!!!!!!!!SOY EL KAMIKAZEEE");
         }
         
-        //turnRadarRight(360);
-        //if(enemigo_cercano.name == robot_detected)
-        //turnRadarLeft(360);
-        //setAdjustRadarForGunTurn(true);
         while(!encontrado){
             turnRadarRight(5); 
-            turnGunRight(10);  
+            //turnGunRight(5);  
             
         }
         if(encontrado){
-            //turnRadarRight(5); 
-            //turnGunRight(15);  
-            //if(enemigo_cercano.distancia > 80)
+            turnGunRight(getRadarHeading()-getGunHeading());  
             while(true) fire(1);
         }
         
