@@ -26,6 +26,7 @@ import java.lang.Math;
 import java.util.concurrent.TimeUnit;
 import robocode.HitRobotEvent;
 import robocode.HitWallEvent;
+import robocode.RobotDeathEvent;
 
 /**
  *
@@ -60,7 +61,7 @@ public class PruebaRobot extends TeamRobot{
     
     LinkedList<node> enemigos = new LinkedList<node>();
     static node enemigo_cercano;
-    static boolean encontrado = false; 
+    static boolean encontrado = false, estoy_muerto = false; 
     
     
  
@@ -73,9 +74,9 @@ public class PruebaRobot extends TeamRobot{
     @Override
     public void onHitRobot(HitRobotEvent event) {
        if (event.getBearing() > -90 && event.getBearing() <= 90) {
-           back(100);
+           back(30);
        } else {
-           ahead(100);
+           ahead(30);
        }
    }
 
@@ -109,8 +110,8 @@ public class PruebaRobot extends TeamRobot{
         System.out.println("El kamikaze en el run es: "+kamikaze);
         
         
-        turnRadarRight(360);turnGunRight(360);
-        turnRadarLeft(360);turnGunLeft(360);
+        turnRadarRight(360);//turnGunRight(360);
+        turnRadarLeft(360);//turnGunLeft(360);
         print(enemigos);
         
         enemigo_cercano = new node(enemigos.get(0).distancia, enemigos.get(0).name);
@@ -118,18 +119,81 @@ public class PruebaRobot extends TeamRobot{
         System.out.println(kamikaze +" ?==? "+getName());
         if(kamikaze.equals(getName())){
             System.out.println("!!!!!!!!!!!!!!!!!SOY EL KAMIKAZEEE");
+            //ahead(enemigo_cercano.distancia-5);
         }
+        matar_enemigo();
+        //turnRadarRight(360);
+        
+    }
+    public void matar_enemigo(){
+        System.out.println("/////////////////////////////////////////////////////////////////////");
+        System.out.println("Entrando en  la funcion matar enemigo");
+        System.out.println("\n @@@@@@ ENEMIGO MÁS CERCANO ES: : "+enemigo_cercano.name+"    esta a distancia: "+enemigo_cercano.distancia);
+        print(enemigos); System.out.println("\n");
+        System.out.println("~$$$$$$$$$$$$$$$$$$$$$$4 Entrando: "+encontrado);
+       
+        
         
         while(!encontrado){
+            System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&6 while(!encontrado)");
             turnRadarRight(5); 
-            //turnGunRight(5);  
-            
         }
-        if(encontrado){
-            turnGunRight(getRadarHeading()-getGunHeading());  
-            while(true) fire(1);
-        }
+        /*while(!encontrado){
+            System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&6 while(!encontrado)");
+            turnRadarRight(5); 
+        }*/
         
+        
+        if(encontrado){
+            double r_heading=getRadarHeading(), g_heading = getGunHeading(), heading = getHeading();
+            if(kamikaze.equals(getName())){
+                //girar(r_heading);
+                System.out.println(" +++++++ GIRAAAAAAAAARRRRR --- HEADING DE RADAR: " + r_heading +"   & mi heading: "+ getHeading());
+
+                if(heading <= 270){
+                        if(r_heading > heading) turnRight(r_heading- heading);
+                        else turnLeft(heading - r_heading);
+                    }
+                    
+                    else {  //headin > 270
+                        if(r_heading>270){
+                            if(r_heading > heading) turnRight(r_heading- heading);
+                            else turnLeft(heading - r_heading);
+                        }
+                        else{
+                            turnLeft(heading-r_heading);
+                        }
+                    }
+                
+                ahead(enemigo_cercano.distancia-30.0);
+                System.out.println(" +++++++  mi heading: "+ getHeading());
+                
+                g_heading = getGunHeading();
+                r_heading=getRadarHeading();
+            }else{
+            
+                if(r_heading <= g_heading) turnGunLeft(g_heading-r_heading); 
+                else if(r_heading>g_heading)turnGunRight(r_heading-g_heading);
+                System.out.println("¨¨¨¨¨¨DENTRO IF ENCONTRADOOOOO ");
+            }
+            
+            while(!estoy_muerto){
+                System.out.println("Matando al enemigo mas cercano : "+enemigo_cercano.name);
+                dispara(enemigo_cercano.distancia);
+            }
+        }
+        encontrado = false;
+        //estoy_muerto = true;
+        
+        System.out.println("Saliendo de la funcion matar enemigo");
+        System.out.println("/////////////////////////////////////////////////////////////////////");
+        if(!enemigos.isEmpty())matar_enemigo();
+        //matar_enemigo();
+    }
+    public void dispara(double distancia_enemigo){
+        if(distancia_enemigo >= 200) fire(1);
+        else if(distancia_enemigo >= 50) fire(2);
+        else fire(3);
     }
     
     @Override
@@ -166,7 +230,6 @@ public class PruebaRobot extends TeamRobot{
     }
     
     public double obtenirDistanciaEsquina(double xc, double xtank, double yc, double ytank){
-        //return Math.abs(xc-xtank) + Math.abs(yc-ytank);
         return Math.sqrt((Math.pow((xc-xtank),2))+(Math.pow((yc-ytank),2)));
     }
     
@@ -308,7 +371,6 @@ public class PruebaRobot extends TeamRobot{
         System.out.println("Angulo convertido: "+angulo);
         turnRight(angulo);
         
-        
     }
     
     
@@ -331,19 +393,8 @@ public class PruebaRobot extends TeamRobot{
             String coordY = ssb2[1];
             X_1 = Double.parseDouble(coordX); 
             Y_1 = Double.parseDouble(coordY);
- 
-            if("epsevg.upc.edu.c2223.PruebaRobot* (1)".equals(sender)){
-                calculaDistancia(sender, X_1, Y_1);
-            }else if("epsevg.upc.edu.c2223.PruebaRobot* (2)".equals(sender)){
-                calculaDistancia(sender, X_1, Y_1);
-            }else if("epsevg.upc.edu.c2223.PruebaRobot* (3)".equals(sender)){
-                calculaDistancia(sender, X_1, Y_1);
-            }else if("epsevg.upc.edu.c2223.PruebaRobot* (4)".equals(sender)){
-               calculaDistancia(sender, X_1, Y_1);
-            }else if("epsevg.upc.edu.c2223.PruebaRobot* (5)".equals(sender)){
-               calculaDistancia(sender, X_1, Y_1);
-            }
-        
+            calculaDistancia(sender, X_1, Y_1);
+            
         }else if(command.equals("DistanciaHaciaLaEsquina")){
             String s = ssb1[1];
             String[] ssb2 = s.split("-");
@@ -357,33 +408,20 @@ public class PruebaRobot extends TeamRobot{
             System.out.println("Mis X:"+getY());
             double ang = calcularAngulo(getX(), getY(), indice);
             
-            
             girar(ang);
-            ahead(dist);
-            //----Radar giratorio---
-            /*for (int i = 0; i < 20; i++) {
-                turnRadarRight(360);
-            }*/
+            int j=0;
+            double mover=0.0;
+            while( j<10 && mover<dist){
+                fire(1);
+                ahead(mover);
+                mover += 15.0;
+                 ++j;
+            }
             
-           
+            
+            
             centinella(indice);
             
-            /*if(indice == 0) turnGunRight(calcularAngulo(getX(), getY(), 2));
-            else if(indice == 1) turnGunRight(calcularAngulo(getX(), getY(), 3));
-            else if(indice == 2) turnGunRight(calcularAngulo(getX(), getY(), 0));
-            else turnGunRight(calcularAngulo(getX(), getY(), 1));
-            */
-            
-            
-            /*for (int i = 0; i < 20; i++) {
-                turnRadarRight(360);
-            }*/
-            //turnRadarRight(360);
-            //turnRadarRight(360);
-            //turnRadarLeft(180);
-            
-            
-          
         }
         else if(command.equals("kamikaze")){
             kamikaze = ssb1[1];
@@ -403,15 +441,13 @@ public class PruebaRobot extends TeamRobot{
             System.out.println("ESTOY A ESTA DISTANCIA "+ distancia_enemigo +"DEL ENEMIGO: "+ name);
             node n = new node(distancia_enemigo, name);
             
-            //bool x = enemigos.contains(name);
-            //if(! enemigos.contains(name)) enemigos.add(n); 
-            //Collections.sort(enemigos);
             boolean find = false;
             int i = 0;
             while(!find && i < enemigos.size()){
-                if(enemigos.get(i).name == name) find = true;
-                else if((enemigos.get(i).name == name) && (enemigos.get(i).distancia != distancia_enemigo)){
+                if(enemigos.get(i).name.equals(name)) find = true;
+                else if((enemigos.get(i).name.equals(name)) && (enemigos.get(i).distancia != distancia_enemigo)){
                     enemigos.get(i).distancia = distancia_enemigo;
+                    Collections.sort(enemigos);
                     find = true;
                 }
                 i++;
@@ -425,6 +461,31 @@ public class PruebaRobot extends TeamRobot{
         if((enemigo_cercano != null) && (enemigo_cercano.name).equals(e.getName())){
             encontrado = true;
         }
+    }
+    
+    @Override
+    public void onRobotDeath(RobotDeathEvent e){
+        String name = e.getName();
+        System.out.println("Robot MUERTOOOOOOOOOOOO: " + name);
+        remove(enemigos, name);//enemigos enemigo_cercano;
+        print(enemigos);
+        if(!enemigos.isEmpty()){
+            if(enemigo_cercano.name == name){
+                enemigo_cercano = enemigos.get(0);
+                encontrado = false;
+                estoy_muerto = true;
+                //matar_enemigo();
+                
+            }
+            else{
+                estoy_muerto = false;
+                encontrado = false;
+            }
+            //else 
+            //stop();
+            //encontrado = false;
+            
+        }else stop();
     }
     
     @Override
